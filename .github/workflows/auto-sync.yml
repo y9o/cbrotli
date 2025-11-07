@@ -20,14 +20,21 @@ jobs:
           rm -rf ./brotli
           git clone --depth=1 https://github.com/google/brotli.git ./brotli
 
-      - name: Get latest tag from brotli
-        id: get_tag
+      - name: Detect if brotli HEAD is tagged
+        id: brotli_tag
         run: |
           cd ./brotli
           git fetch --tags
-          latest_tag=$(git tag | sort -V | tail -n 1)
-          echo "Latest tag is: $latest_tag"
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          tags=$(git tag --points-at HEAD)
+          if [ -n "$tags" ]; then
+            tag=$(echo "$tags" | head -n 1)
+            echo "Brotli HEAD has tag: $tag"
+            echo "has_tag=true" >> $GITHUB_ENV
+            echo "latest_tag=$tag" >> $GITHUB_ENV
+          else
+            echo "Brotli HEAD has no tag."
+            echo "has_tag=false" >> $GITHUB_ENV
+          fi
 
       - name: Run update script in brotli
         run: |
@@ -45,15 +52,19 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           if ! git diff --cached --quiet; then
-            git commit -m "Auto update from google/brotli tag ${{ env.latest_tag }}"
+            commit_msg="Auto update from google/brotli"
+            if [ "$has_tag" = "true" ]; then
+              commit_msg="$commit_msg tag $latest_tag"
+            fi
+            git commit -m "$commit_msg"
             git push
           else
             echo "No changes to commit."
-            exit 1
+            exit 0
           fi
 
       - name: Create matching tag in this repo
-        if: success() && github.ref == 'refs/heads/main'
+        if: env.has_tag == 'true' && success() && github.ref == 'refs/heads/main'
         run: |
-          git tag ${{ env.latest_tag }}
-          git push origin ${{ env.latest_tag }}
+          git tag "$latest_tag"
+          git push origin "$latest_tag"
