@@ -1,4 +1,4 @@
-name: Auto sync brotli upstream with matching tag
+name: Auto sync brotli upstream
 
 on:
   schedule:
