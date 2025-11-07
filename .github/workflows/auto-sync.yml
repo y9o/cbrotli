@@ -1,0 +1,58 @@
+name: Auto sync brotli upstream with matching tag
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-brotli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Clone google/brotli
+        run: |
+          rm -rf ./brotli
+          git clone --depth=1 https://github.com/google/brotli.git ./brotli
+
+      - name: Get latest tag from brotli
+        id: get_tag
+        run: |
+          cd ./brotli
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "Latest tag is: $latest_tag"
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+
+      - name: Run update script in brotli
+        run: |
+          chmod +x ./tool/update.sh
+          ./tool/update.sh
+
+      - name: Run go tests
+        run: |
+          set -e
+          go test ./...
+
+      - name: Commit and push if there are changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto update from google/brotli tag ${{ env.latest_tag }}"
+            git push
+          else
+            echo "No changes to commit."
+            exit 1
+          fi
+
+      - name: Create matching tag in this repo
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git tag ${{ env.latest_tag }}
+          git push origin ${{ env.latest_tag }}
