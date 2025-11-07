@@ -34,7 +34,7 @@ done
 cp -r ./brotli/go/cbrotli/* ./c/
 
 find ./c/ -type f -exec sed -Ei 's/^#include <brotli\/(\w+.\w+)>/#include "brotli_\1"/' {} +
-find ./c/ -type f -name "cgo.go" -exec sed -Ei 's/^(\/\/\s#cgo\spkg-config:.*)/\/\/\1\n#cgo LDFLAGS: -lm/' {} +
+find ./c/ -type f -name "cgo.go" -exec sed -Ei 's/^(\/\/\s#cgo\spkg-config:.*)/\/\/\1\n\/\/#cgo LDFLAGS: -lm/' {} +
 find ./c/ -type f \( -name "*.go" -o -name "*.mod" \) -exec sed -Ei 's#github.com/google/brotli/go/cbrotli#github.com/y9o/cbrotli#' {} +
 
 rm ./c/BUILD.bazel ./c/enc_static_init_lazy.cc
