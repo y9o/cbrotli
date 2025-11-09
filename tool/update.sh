@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2025 y9o. Licensed under the MIT License.
 
 rm -rf ./brotli
 git clone --depth=1 https://github.com/google/brotli.git ./brotli
