@@ -132,8 +132,12 @@ static BROTLI_NOINLINE void EXPORT_FN(CreateBackwardReferences)(
       for (;; --max_length) {
         const score_t cost_diff_lazy = 175;
         HasherSearchResult sr2;
-        sr2.len = params->quality < MIN_QUALITY_FOR_EXTENSIVE_REFERENCE_SEARCH ?
-            BROTLI_MIN(size_t, sr.len - 1, max_length) : 0;
+        sr2.len =
+            params->quality < MIN_QUALITY_FOR_EXTENSIVE_REFERENCE_SEARCH
+                ? BROTLI_MIN(size_t, sr.len - 1, max_length)
+                : BROTLI_MIN(size_t,
+                             MinimumBetterLength(sr.score + cost_diff_lazy - 1),
+                             max_length);
         sr2.len_code_delta = 0;
         sr2.distance = 0;
         sr2.score = kMinScore;
@@ -205,6 +209,13 @@ static BROTLI_NOINLINE void EXPORT_FN(CreateBackwardReferences)(
         if (sr.distance < (sr.len >> 2)) {
           range_start = BROTLI_MIN(size_t, range_end, BROTLI_MAX(size_t,
               range_start, position + sr.len - (sr.distance << 2)));
+        }
+        /* The next search is at position + sr.len (the one-ahead in the
+           prefetch helper covers only the cur_ix + 1 successor): prefetch its
+           dictionary heads[] line before the StoreRange loop. */
+        if (ENABLE_COMPOUND_DICTIONARY) {
+          PrefetchCompoundDictionaryHeadsOpt(&params->dictionary.compound,
+              ringbuffer, ringbuffer_mask, position + sr.len);
         }
         FN(StoreRange)(privat, ringbuffer, ringbuffer_mask, range_start,
                        range_end);
