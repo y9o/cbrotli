@@ -23,6 +23,8 @@
 #include "enc_compress_fragment.h"
 #include "enc_dictionary_hash.h"
 #include "enc_encoder_dict.h"
+#include "enc_enc_state.h"
+#include "enc_enc_static_init.h"
 #include "enc_fast_log.h"
 #include "enc_hash.h"
 #include "enc_histogram.h"
@@ -31,8 +33,6 @@
 #include "enc_params.h"
 #include "enc_quality.h"
 #include "enc_ringbuffer.h"
-#include "enc_state.h"
-#include "enc_static_init.h"
 #include "enc_utf8_util.h"
 #include "enc_write_bits.h"
 

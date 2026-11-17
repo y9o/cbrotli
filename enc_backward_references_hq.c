@@ -20,7 +20,6 @@
 #include "enc_literal_cost.h"
 #include "enc_memory.h"
 #include "enc_params.h"
-#include "enc_prefix.h"
 #include "enc_quality.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)

@@ -15,10 +15,10 @@
 #include "common_transform.h"
 #include "common_version.h"
 #include "dec_bit_reader.h"
+#include "dec_dec_static_init.h"
 #include "dec_huffman.h"
 #include "dec_prefix.h"
 #include "dec_state.h"
-#include "dec_static_init.h"
 
 #if defined(BROTLI_TARGET_NEON)
 #include <arm_neon.h>

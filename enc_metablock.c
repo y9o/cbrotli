@@ -18,7 +18,6 @@
 #include "enc_histogram.h"
 #include "enc_memory.h"
 #include "enc_params.h"
-#include "enc_prefix.h"
 #include "common_constants.h"
 #include "common_context.h"
 #include "common_platform.h"
