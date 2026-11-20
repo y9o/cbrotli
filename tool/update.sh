@@ -19,7 +19,7 @@ for f in ./c/enc/*; do
     [ -f "$f" ] || continue
     mv -n "$f" "./c/enc_$(basename "$f")"
 done
-find ./c/ -type f -exec sed -Ei 's/^#include "..\/common\/(\w+.\w+)"/#include "common_\1"/' {} +
+find ./c/ -type f -exec sed -Ei 's/^#include "(..\/)?common\/(\w+.\w+)"/#include "common_\2"/' {} +
 
 find ./c/common/ -type f -exec sed -Ei 's/^#include "(\w+.\w+)"/#include "common_\1"/' {} +
 for f in ./c/common/*; do
